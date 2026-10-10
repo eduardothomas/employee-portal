@@ -1,0 +1,70 @@
+# Publishes both web apps to GitHub Pages:
+#   https://<usuario>.github.io/<repo>/        → Employee App
+#   https://<usuario>.github.io/<repo>/admin/  → Portal RRHH / Admin
+#
+# Backend used by the published site (first match wins):
+#   1. "backend" input when run manually (Actions → Deploy GitHub Pages → Run workflow)
+#   2. Repository variable PAGES_BACKEND  (Settings → Secrets and variables → Actions → Variables)
+#   3. web/.env.production (VITE_BACKEND, default "demo")
+# API URL when backend = api: repository variable PAGES_API_URL, else web/.env.production.
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['web/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+    inputs:
+      backend:
+        description: 'Backend del sitio publicado'
+        type: choice
+        options: [default, demo, api]
+        default: default
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Resolve backend mode
+        id: mode
+        run: |
+          BACKEND="${{ inputs.backend }}"
+          if [ -z "$BACKEND" ] || [ "$BACKEND" = "default" ]; then BACKEND="${{ vars.PAGES_BACKEND }}"; fi
+          if [ -n "$BACKEND" ]; then echo "VITE_BACKEND=$BACKEND" >> "$GITHUB_ENV"; fi
+          if [ -n "${{ vars.PAGES_API_URL }}" ]; then echo "VITE_API_URL=${{ vars.PAGES_API_URL }}" >> "$GITHUB_ENV"; fi
+          echo "Backend: ${BACKEND:-from web/.env.production}"
+      - name: Build both apps
+        run: REPO_NAME="${{ github.event.repository.name }}" scripts/build-pages.sh
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/_site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

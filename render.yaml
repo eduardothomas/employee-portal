@@ -1,0 +1,26 @@
+# Render Blueprint — API .NET en el plan gratuito (Docker).
+# Render → New → Blueprint → elige este repositorio. Te pedirá los valores marcados "sync: false".
+services:
+  - type: web
+    name: employee-portal-api
+    runtime: docker
+    plan: free
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: Database__Provider
+        value: Postgres
+      # Pega aquí la cadena de Neon tal cual (postgresql://...); la API la convierte sola.
+      - key: ConnectionStrings__Default
+        sync: false
+      # Origen del front (sin ruta): https://<tu-usuario>.github.io
+      - key: Cors__Origins
+        sync: false
+      - key: Jwt__SigningKey
+        generateValue: true
+      # Solo para demo: muestra el código MFA en pantalla porque aún no hay envío por SMS/email.
+      - key: Auth__ExposeMfaCodeInResponse
+        value: "true"

@@ -1,0 +1,35 @@
+# Full stack: PostgreSQL + API + both web apps.
+#   docker compose up --build
+#   Employee app → http://localhost:8080   HR portal → http://localhost:8081   API → http://localhost:5080
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: employee_portal
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: portal
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portal -d employee_portal"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: ./backend
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development # exposes MFA codes in responses — demo only
+      ConnectionStrings__Default: Host=db;Port=5432;Database=employee_portal;Username=portal;Password=portal
+      Database__Provider: Postgres
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:-local-docker-signing-key-change-me-0123456789abcdef}
+    ports: ["5080:8080"]
+
+  web:
+    build: ./web
+    depends_on: [api]
+    ports: ["8080:8080", "8081:8081"]
+
+volumes:
+  pgdata:

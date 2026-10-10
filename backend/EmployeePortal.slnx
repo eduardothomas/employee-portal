@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/EmployeePortal.Api/EmployeePortal.Api.csproj" />
+    <Project Path="src/EmployeePortal.Application/EmployeePortal.Application.csproj" />
+    <Project Path="src/EmployeePortal.Contracts/EmployeePortal.Contracts.csproj" />
+    <Project Path="src/EmployeePortal.Domain/EmployeePortal.Domain.csproj" />
+    <Project Path="src/EmployeePortal.Infrastructure/EmployeePortal.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/EmployeePortal.Tests/EmployeePortal.Tests.csproj" />
+  </Folder>
+</Solution>
