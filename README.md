@@ -10,6 +10,7 @@ Plataforma de **Employee Self-Service** para Panamá: el colaborador consulta de
 |---|---|---|
 | 📱 **Employee App** (web móvil / PWA) | React 19 + TypeScript + Vite | `5173` |
 | 🖥️ **HR / Admin Portal** | React 19 + TypeScript + Vite | `5174` |
+| 📲 **App móvil iOS + Android** | Kotlin Multiplatform + Compose Multiplatform | — |
 | ☁️ **API** | ASP.NET Core 10 (Minimal APIs) + EF Core | `5080` |
 | 🗄️ **Base de datos** | PostgreSQL 17 (o SQLite para desarrollo sin Docker) | `5432` |
 
@@ -101,6 +102,7 @@ EmployeePortal/
 │   ├── packages/shared            Cliente API, auth, tipos, formatos (compartido)
 │   ├── apps/employee              App del colaborador (móvil-first, PWA)
 │   └── apps/admin                 Portal RRHH / Admin
+├── mobile/                        App del colaborador nativa (iOS + Android) — ver mobile/README.md
 ├── docs/                          Arquitectura, API, decisiones, roadmap
 └── docker-compose.yml
 ```
