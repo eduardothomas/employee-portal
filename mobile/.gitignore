@@ -9,3 +9,4 @@ iosApp/build/
 xcuserdata/
 *.xcworkspace/xcuserdata/
 DerivedData/
+keystore/
